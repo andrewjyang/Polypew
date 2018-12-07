@@ -24,6 +24,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var starfield: SKEmitterNode!
     var player: SKSpriteNode!
     
+    var collisionCounter: Int = 0 {
+        didSet {
+            if collisionCounter % 5 == 0 {
+                let questionAnswer = QuestionAnswer()
+                print("Qustion: \(questionAnswer.question)")
+                print("Options: \(questionAnswer.options)")
+                print("Answer: \(questionAnswer.answer)")
+            }
+        }
+    }
+    
     var scoreLabel: SKLabelNode!
     var score: Int = 0 {
         didSet {
@@ -147,8 +158,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
-            print("We have contact with an astrogen")
-            
+//            print("We have contact with an astrogen")
+            collisionCounter += 1
         }
         
         

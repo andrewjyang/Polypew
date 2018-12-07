@@ -32,7 +32,11 @@ struct QuestionAnswer {
     func generateOptions(answer: String) -> [String] {
         var options = [String]()
         for _ in 0..<3 {
-            options.append("\(Int.random(in: 0...100))")
+            var option = Int.random(in: 0...100)
+            while "\(option)" == answer {
+                option = Int.random(in: 0...100)
+            }
+            options.append("\(option)")
         }
         options.append(answer)
         return options.shuffled()
@@ -44,7 +48,7 @@ struct QuestionAnswer {
      - Returns: A dictionary consisting of question key and answer value
     */
     func generateQuestionAnswer() -> [String: String] {
-        let options = Int.random(in: 0...4)
+        let options = Int.random(in: 0..<4)
         switch options {
         case 0:
             return multiplicationQuestion()
@@ -65,8 +69,8 @@ struct QuestionAnswer {
      - Returns: A dictionary with a question key and answer value
     */
     func multiplicationQuestion() -> [String: String] {
-        var rand1 = Int.random(in: 0...10)
-        var rand2 = Int.random(in: 0...10)
+        var rand1 = Int.random(in: 1...10)
+        var rand2 = Int.random(in: 1...10)
         let options = Int.random(in: 0...2)
         var question = ""
         var answer = ""
@@ -76,15 +80,15 @@ struct QuestionAnswer {
             question = "\(rand1) x \(rand2) = ?"
         case 1:
             while rand2 % rand1 != 0 {
-                rand2 = Int.random(in: 0...10)
-                rand1 = Int.random(in: 0...10)
+                rand2 = Int.random(in: 1...10)
+                rand1 = Int.random(in: 1...10)
             }
             question = "\(rand1) * ? = \(rand2)"
             answer = "\(rand2 / rand1)"
         case 2:
             while rand1 % rand2 != 0 {
-                rand2 = Int.random(in: 0...10)
-                rand1 = Int.random(in: 0...10)
+                rand2 = Int.random(in: 1...10)
+                rand1 = Int.random(in: 1...10)
             }
             question = "? * \(rand2) = \(rand1)"
             answer = "\(rand1 / rand2)"
@@ -102,8 +106,8 @@ struct QuestionAnswer {
      - Returns: A dictionary with a question key and answer value
      */
     func additionQuestion() -> [String: String] {
-        let rand1 = Int.random(in: 0...100)
-        let rand2 = Int.random(in: 0...100)
+        var rand1 = Int.random(in: 0...100)
+        var rand2 = Int.random(in: 0...100)
         let options = Int.random(in: 0...2)
         var question = ""
         var answer = ""
@@ -112,6 +116,10 @@ struct QuestionAnswer {
             answer = "\(rand1 + rand2)"
             question = "\(rand1) + \(rand2) = ?"
         case 1:
+            while rand2 - rand1 < 0 {
+                rand2 = Int.random(in: 0...100)
+                rand1 = Int.random(in: 0...100)
+            }
             question = "\(rand1) + ? = \(rand2)"
             answer = "\(rand2 - rand1)"
         case 2:
@@ -145,17 +153,13 @@ struct QuestionAnswer {
             answer = "\(rand1 - rand2)"
             question = "\(rand1) - \(rand2) = ?"
         case 1:
-            while rand2 < rand1 {
+            while rand1 < rand2 {
                 rand1 = Int.random(in: 0...100)
                 rand2 = Int.random(in: 0...100)
             }
             question = "\(rand1) - ? = \(rand2)"
             answer = "\(rand1 - rand2)"
         case 2:
-            while rand1 < rand2 {
-                rand1 = Int.random(in: 0...100)
-                rand2 = Int.random(in: 0...100)
-            }
             question = "? - \(rand2) = \(rand1)"
             answer = "\(rand1 + rand2)"
         default:
@@ -172,8 +176,8 @@ struct QuestionAnswer {
      - Returns: A dictionary with a question key and answer value
      */
     func divisionQuestion() -> [String: String] {
-        var rand1 = Int.random(in: 0...10)
-        var rand2 = Int.random(in: 0...10)
+        var rand1 = Int.random(in: 1...10)
+        var rand2 = Int.random(in: 1...10)
         let options = Int.random(in: 0...2)
         var question = ""
         var answer = ""
@@ -183,15 +187,15 @@ struct QuestionAnswer {
             question = "? / \(rand1) = \(rand2)"
         case 1:
             while rand2 % rand1 != 0 {
-                rand2 = Int.random(in: 0...10)
-                rand1 = Int.random(in: 0...10)
+                rand2 = Int.random(in: 1...10)
+                rand1 = Int.random(in: 1...10)
             }
             question = "\(rand1) / \(rand2) = ?"
             answer = "\(rand1 / rand2)"
         case 2:
             while rand1 % rand2 != 0 {
-                rand2 = Int.random(in: 0...10)
-                rand1 = Int.random(in: 0...10)
+                rand2 = Int.random(in: 1...10)
+                rand1 = Int.random(in: 1...10)
             }
             question = "\(rand1) / ? = \(rand2)"
             answer = "\(rand1 / rand2)"
