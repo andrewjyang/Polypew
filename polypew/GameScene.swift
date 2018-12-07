@@ -36,9 +36,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     var scoreLabel: SKLabelNode!
+    var healthLabel: SKLabelNode!
     var score: Int = 0 {
         didSet {
             scoreLabel.text = "Score: \(score)"
+        }
+    }
+    
+    var playerHealth: Int = 25 {
+        didSet {
+            if playerHealth <= 0 {
+                playerHealth = 0
+                gameOver()
+            }
+            healthLabel.text = "Health: \(playerHealth)"
         }
     }
     
@@ -53,8 +64,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didMove(to view: SKView) {
-        self.physicsWorld.contactDelegate = self
-        
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
         starfield.advanceSimulationTime(10)
@@ -82,14 +91,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         score = 0
         self.addChild(scoreLabel)
         
+        healthLabel = SKLabelNode(text: "Health: 25")
+        healthLabel.position = CGPoint(x: self.frame.minX + 100, y: self.frame.maxY - player.size.height)
+        healthLabel.fontName = "Menlo-Bold"
+        healthLabel.fontSize = 24
+        healthLabel.fontColor = UIColor.white
+        self.addChild(healthLabel)
+        
+        
+        dropAstrogens()
+        
+    }
+    
+    func gameOver() {
+        self.isPaused = true
+        spawnAstrogon.invalidate()
+    }
+    
+    func dropAstrogens() {
         spawnAstrogon = Timer.scheduledTimer(timeInterval: 0.75, target: self, selector: #selector(addAstrogon), userInfo: nil, repeats: true)
-        
-        
     }
     
     @objc func addAstrogon() {
         astrogons = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: astrogons) as! [String]
-        let astrogon  = SKSpriteNode(imageNamed: astrogons.randomElement()!)
+        let imageName = astrogons.randomElement()!
+        let astrogon  = SKSpriteNode(imageNamed: imageName)
+        astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
         let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
         
@@ -137,18 +164,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         torpedo.run(SKAction.sequence(actions))
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let torpedo = SKSpriteNode(imageNamed: "torpedo")
-        torpedo.size = CGSize(width: 32, height: 32)
-        let position = self.player.position
-        let move = SKAction.move(to: CGPoint(x: position.x, y: self.frame.maxY + torpedo.size.height), duration: 5)
-        
-        torpedo.physicsBody = SKPhysicsBody(circleOfRadius: torpedo.size.height/2)
-        torpedo.physicsBody?.affectedByGravity = false
-    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        fireTorpedo()
+        if !self.isPaused {
+            fireTorpedo()
+        }
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -158,10 +179,42 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
+            if contact.bodyA.categoryBitMask == NodeCategory.torpedo.rawValue || contact.bodyB.categoryBitMask == NodeCategory.torpedo.rawValue {
+                // we are hitting a torpedo
+                contact.bodyA.node?.removeFromParent()
+                contact.bodyB.node?.removeFromParent()
+                score += 1
+            } else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
+                var shapeSides = 0
+                if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue {
+                    contact.bodyA.node?.removeFromParent()
+                    shapeSides = getSidesFromName(name:(contact.bodyA.node?.name)!)
+                } else {
+                    contact.bodyB.node?.removeFromParent()
+                    shapeSides = getSidesFromName(name:(contact.bodyB.node?.name)!)
+                }
+                collisionCounter += 1
+                playerHealth -= shapeSides
+            }
 //            print("We have contact with an astrogen")
-            collisionCounter += 1
+            
         }
-        
-        
+    }
+    
+    func getSidesFromName(name: String) -> Int {
+        switch name {
+            case "triangle":
+                return 3
+            case "square":
+                return 4
+            case "pentagon":
+                return 5
+            case "hexagon":
+                return 6
+            case "octagon":
+                return 8
+            default:
+                return 0
+        }
     }
 }
