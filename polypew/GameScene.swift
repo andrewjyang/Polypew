@@ -105,6 +105,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     }
     
+    func fireTorpedo() {
+        self.run(SKAction.playSoundFileNamed("pew.mp3", waitForCompletion: false))
+        let torpedo = SKSpriteNode(imageNamed: "torpedo")
+        torpedo.position = player.position
+        torpedo.position.y += 5
+        torpedo.physicsBody = SKPhysicsBody(circleOfRadius: torpedo.size.width / 2)
+        torpedo.physicsBody?.isDynamic = true
+        
+        torpedo.physicsBody?.categoryBitMask = NodeCategory.torpedo.rawValue
+        torpedo.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
+        torpedo.physicsBody?.collisionBitMask = 0
+        torpedo.physicsBody?.usesPreciseCollisionDetection = true
+        self.addChild(torpedo)
+        
+        let animationDuration: TimeInterval = 0.3
+        var actions = [SKAction]()
+        actions.append(SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.size.height + 10), duration: animationDuration))
+        actions.append(SKAction.removeFromParent())
+        torpedo.run(SKAction.sequence(actions))
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let torpedo = SKSpriteNode(imageNamed: "torpedo")
         torpedo.size = CGSize(width: 32, height: 32)
@@ -113,7 +134,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         torpedo.physicsBody = SKPhysicsBody(circleOfRadius: torpedo.size.height/2)
         torpedo.physicsBody?.affectedByGravity = false
-        
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        fireTorpedo()
     }
     
     override func update(_ currentTime: TimeInterval) {
