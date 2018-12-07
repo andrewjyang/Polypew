@@ -1,10 +1,20 @@
-//
-//  GameScene.swift
-//  polypew
-//
-//  Created by Andrew Yang on 11/27/18.
-//  Copyright © 2018 Andrew Yang. All rights reserved.
-//
+
+/* GameScene.swift
+ * polypew
+ *
+ * Description: Polypew is a an educational space-themed game using the SpriteKit framework.
+ *
+ * CPSC 315-01, Fall 2018
+ * Programming Assignment: Final Project
+ * Sources:
+ *  triangle icon: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  square icon: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  pentagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  hexagon icon: <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  octagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * Created by Andrew Yang and Andrew Zenoni on November 29, 2018
+ * Copyright © 2018 Andrew Yang and Andrew Zenoni. All rights reserved.
+ */
 
 import SpriteKit
 import GameplayKit
@@ -22,7 +32,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     var spawnAstrogon: Timer!
-    var astrogons = ["hexagon"]
+    var astrogons = ["triangle", "square", "pentagon", "hexagon", "octagon"]
     
     let astrogonCategory: UInt32 = 0x1 << 1
     let torpedoCategory: UInt32 = 0x1 << 0
@@ -59,6 +69,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         astrogons = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: astrogons) as! [String]
         let astrogon  = SKSpriteNode(imageNamed: astrogons[0])
         astrogon.size = CGSize(width: 100, height: 100)
+        
         let astrogonPosition = GKRandomDistribution(lowestValue: -300, highestValue: 300)
         let position = CGFloat(astrogonPosition.nextInt())
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
@@ -68,13 +79,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         astrogon.physicsBody?.contactTestBitMask = torpedoCategory
         astrogon.physicsBody?.collisionBitMask = 0
         self.addChild(astrogon)
-        let animationDuration: TimeInterval = 5
+        let animationDuration: TimeInterval = 6
         
         var actions = [SKAction]()
         actions.append(SKAction.move(to: CGPoint(x: position, y: -astrogon.size.height), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
 
         astrogon.run(SKAction.sequence(actions))
+        
+        let rotateAstrogon = SKAction.rotate(byAngle: 2 * CGFloat.pi, duration: 2)
+        let rotateAstrogonForever = SKAction.repeatForever(rotateAstrogon)
+        astrogon.run(rotateAstrogonForever)
     }
     
     
