@@ -42,6 +42,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didMove(to view: SKView) {
+        self.physicsWorld.contactDelegate = self
+        
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
         starfield.advanceSimulationTime(10)
@@ -52,9 +54,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.size = CGSize(width: 160, height: 140)
         player.position = CGPoint(x: self.frame.midX, y: self.frame.minY + player.size.height)
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
-        player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
-        player.zPosition = 1
-//        player.physicsBody?.contactTestBitMask =
+        
+        player.physicsBody?.categoryBitMask = NodeCategory.player.rawValue
+        player.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
+        player.physicsBody?.collisionBitMask = 0
         addChild(player)
         
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
@@ -81,7 +84,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let position = CGFloat(astrogonPosition.nextInt())
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
-        
+        astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
         astrogon.physicsBody?.categoryBitMask = NodeCategory.astrogon.rawValue
         astrogon.physicsBody?.contactTestBitMask = NodeCategory.torpedo.rawValue | NodeCategory.player.rawValue
@@ -119,6 +122,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func didBegin(_ contact: SKPhysicsContact) {
-        // determining when object hit each other
+        if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
+            print("We have contact with an astrogen")
+            
+        }
+        
+        
     }
 }

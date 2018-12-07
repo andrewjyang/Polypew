@@ -20,6 +20,7 @@
 		4942BFE921AE81970089A1DD /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 4942BFE821AE81970089A1DD /* spark.png */; };
 		4942BFEC21AE81BC0089A1DD /* explosion.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4942BFEA21AE81BC0089A1DD /* explosion.sks */; };
 		4942BFED21AE81BC0089A1DD /* starfield.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4942BFEB21AE81BC0089A1DD /* starfield.sks */; };
+		4D3893EA21BA442600DE4668 /* QuestionAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3893E921BA442600DE4668 /* QuestionAnswer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		4942BFE821AE81970089A1DD /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		4942BFEA21AE81BC0089A1DD /* explosion.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = explosion.sks; sourceTree = "<group>"; };
 		4942BFEB21AE81BC0089A1DD /* starfield.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = starfield.sks; sourceTree = "<group>"; };
+		4D3893E921BA442600DE4668 /* QuestionAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionAnswer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 				4942BFD721AE60EA0089A1DD /* Assets.xcassets */,
 				4942BFD921AE60EA0089A1DD /* LaunchScreen.storyboard */,
 				4942BFDC21AE60EA0089A1DD /* Info.plist */,
+				4D3893E921BA442600DE4668 /* QuestionAnswer.swift */,
 			);
 			path = polypew;
 			sourceTree = "<group>";
@@ -169,6 +172,7 @@
 				4942BFD121AE60E80089A1DD /* GameScene.swift in Sources */,
 				4942BFD321AE60E80089A1DD /* GameViewController.swift in Sources */,
 				4942BFCB21AE60E80089A1DD /* AppDelegate.swift in Sources */,
+				4D3893EA21BA442600DE4668 /* QuestionAnswer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
