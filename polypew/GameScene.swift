@@ -53,7 +53,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.position = CGPoint(x: self.frame.midX, y: self.frame.minY + player.size.height)
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
+        player.zPosition = 1
 //        player.physicsBody?.contactTestBitMask =
+        addChild(player)
         
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
         self.physicsWorld.contactDelegate = self
@@ -76,6 +78,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: astrogons.randomElement()!)
         astrogon.size = CGSize(width: 84, height: 84)
         let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
+        
+        let position = CGFloat(astrogonPosition.nextInt())
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         
         astrogon.physicsBody?.isDynamic = true
@@ -96,6 +100,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let rotateAstrogonForever = SKAction.repeatForever(rotateAstrogon)
         astrogon.run(rotateAstrogonForever)
     
+    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let torpedo = SKSpriteNode(imageNamed: "torpedo")
@@ -116,3 +121,4 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         // determining when object hit each other
     }
+}
