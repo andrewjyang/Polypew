@@ -183,6 +183,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 // we are hitting a torpedo
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
+                animateExplosion(at: (contact.bodyA.node?.position)!)
                 score += 1
             } else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
                 var shapeSides = 0
@@ -199,6 +200,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 //            print("We have contact with an astrogen")
             
         }
+    }
+    
+    func animateExplosion(at position: CGPoint) {
+        self.run(SKAction.playSoundFileNamed("explosion", waitForCompletion: false))
+        let explosion = SKEmitterNode(fileNamed: "explosion")!
+        explosion.position = position // change from hard-coded value
+        explosion.advanceSimulationTime(1)
+        explosion.zPosition = 1
+        
+        let fadeOut = SKAction.fadeOut(withDuration: 1)
+        let remove = SKAction.removeFromParent()
+        explosion.run(SKAction.sequence([fadeOut, remove]))
+        self.addChild(explosion)
     }
     
     func getSidesFromName(name: String) -> Int {
