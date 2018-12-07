@@ -1,10 +1,20 @@
-//
-//  GameScene.swift
-//  polypew
-//
-//  Created by Andrew Yang on 11/27/18.
-//  Copyright © 2018 Andrew Yang. All rights reserved.
-//
+
+/* GameScene.swift
+ * polypew
+ *
+ * Description: Polypew is a an educational space-themed game using the SpriteKit framework.
+ *
+ * CPSC 315-01, Fall 2018
+ * Programming Assignment: Final Project
+ * Sources:
+ *  triangle icon: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  square icon: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  pentagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  hexagon icon: <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ *  octagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * Created by Andrew Yang and Andrew Zenoni on November 29, 2018
+ * Copyright © 2018 Andrew Yang and Andrew Zenoni. All rights reserved.
+ */
 
 import SpriteKit
 import GameplayKit
@@ -22,14 +32,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     var spawnAstrogon: Timer!
-    var astrogons = ["hexagon", "square", "triangle"]
+    var astrogons = ["triangle", "square", "pentagon", "hexagon", "octagon"]
     
     
     enum NodeCategory: UInt32 {
         case player = 1
         case astrogon = 2
         case torpedo = 4
-        // unique powers of two because of bitwise and-ing and or-ing
     }
     
     override func didMove(to view: SKView) {
@@ -43,8 +52,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.size = CGSize(width: 160, height: 140)
         player.position = CGPoint(x: self.frame.midX, y: self.frame.minY + player.size.height)
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
-//        player.physicsBody?.contactTestBitMask = 
-        self.addChild(player)
+        player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
+//        player.physicsBody?.contactTestBitMask =
         
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
         self.physicsWorld.contactDelegate = self
@@ -67,7 +76,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: astrogons.randomElement()!)
         astrogon.size = CGSize(width: 84, height: 84)
         let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
-        let position = CGFloat(astrogonPosition.nextInt())
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         
         astrogon.physicsBody?.isDynamic = true
@@ -75,14 +83,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         astrogon.physicsBody?.contactTestBitMask = NodeCategory.torpedo.rawValue | NodeCategory.player.rawValue
         astrogon.physicsBody?.collisionBitMask = 0
         self.addChild(astrogon)
-        let animationDuration: TimeInterval = 5
+        let animationDuration: TimeInterval = 6
         
         var actions = [SKAction]()
         actions.append(SKAction.move(to: CGPoint(x: position, y: self.frame.minY - astrogon.size.height), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
 
         astrogon.run(SKAction.sequence(actions))
-    }
+        
+        
+        let rotateAstrogon = SKAction.rotate(byAngle: 2 * CGFloat.pi, duration: 2)
+        let rotateAstrogonForever = SKAction.repeatForever(rotateAstrogon)
+        astrogon.run(rotateAstrogonForever)
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let torpedo = SKSpriteNode(imageNamed: "torpedo")
@@ -95,12 +108,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
     }
     
+    
     func didBegin(_ contact: SKPhysicsContact) {
         // determining when object hit each other
     }
-}
