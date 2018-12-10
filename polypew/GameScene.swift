@@ -24,19 +24,81 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var starfield: SKEmitterNode!
     var player: SKSpriteNode!
     
+    var viewController: GameViewController? = nil
+    
+    var multiplier: Int = 1 {
+        didSet {
+            multiplierLabel.text = "x\(multiplier)"
+        }
+    }
+    
     var collisionCounter: Int = 0 {
         didSet {
             if collisionCounter % 5 == 0 {
+                pauseGame()
                 let questionAnswer = QuestionAnswer()
                 print("Qustion: \(questionAnswer.question)")
                 print("Options: \(questionAnswer.options)")
                 print("Answer: \(questionAnswer.answer)")
+                
+                let alert = UIAlertController(title: questionAnswer.question, message: "Pick an answer from below:", preferredStyle: .actionSheet)
+                alert.addAction(UIAlertAction(title: questionAnswer.options[0], style: .default, handler: { action in
+                    if(questionAnswer.options[0] == questionAnswer.answer) {
+                        self.multiplier += 1
+                        print("guessed correctly")
+                    } else {
+                        self.multiplier = 1
+                    }
+                    self.isPaused = false
+                    self.dropAstrogens()
+                }))
+                
+                alert.addAction(UIAlertAction(title: questionAnswer.options[1], style: .default, handler: { action in
+                    if(questionAnswer.options[1] == questionAnswer.answer) {
+                        self.multiplier += 1
+                        print("guessed correctly")
+                    } else {
+                        self.multiplier = 1
+                    }
+                    self.isPaused = false
+                    self.dropAstrogens()
+                }))
+                
+                alert.addAction(UIAlertAction(title: questionAnswer.options[2], style: .default, handler: { action in
+                    if(questionAnswer.options[2] == questionAnswer.answer) {
+                        self.multiplier += 1
+                        print("guessed correctly")
+                    } else {
+                        self.multiplier = 1
+                    }
+                    self.isPaused = false
+                    self.dropAstrogens()
+                }))
+                
+                alert.addAction(UIAlertAction(title: questionAnswer.options[3], style: .default, handler: { action in
+                    if(questionAnswer.options[3] == questionAnswer.answer) {
+                        self.multiplier += 1
+                        
+                        print("guessed correctly")
+                    } else {
+                        self.multiplier = 1
+                    }
+                    self.isPaused = false
+                    self.dropAstrogens()
+                }))
+                
+                if self.viewController != nil {
+                    self.viewController!.present(alert, animated: true, completion: nil)
+                }
+                
+                
             }
         }
     }
     
     var scoreLabel: SKLabelNode!
     var healthLabel: SKLabelNode!
+    var multiplierLabel: SKLabelNode!
     var score: Int = 0 {
         didSet {
             scoreLabel.text = "Score: \(score)"
@@ -47,7 +109,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         didSet {
             if playerHealth <= 0 {
                 playerHealth = 0
-                gameOver()
+                pauseGame()
             }
             healthLabel.text = "Health: \(playerHealth)"
         }
@@ -85,15 +147,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         scoreLabel = SKLabelNode(text: "Score: 0")
         scoreLabel.position = CGPoint(x: self.frame.midX, y: self.frame.maxY - player.size.height)
-        scoreLabel.fontName = "Menlo-Bold"
+        scoreLabel.fontName = "Marker Felt Thin"
         scoreLabel.fontSize = 36
         scoreLabel.fontColor = UIColor.white
         score = 0
         self.addChild(scoreLabel)
         
+        multiplierLabel = SKLabelNode(text: "x1")
+        multiplierLabel.position = CGPoint(x: self.frame.maxX - 150, y: self.frame.maxY - player.size.height)
+        multiplierLabel.fontName = "Marker Felt Thin"
+        multiplierLabel.fontSize = 36
+        multiplierLabel.fontColor = UIColor.green
+        self.addChild(multiplierLabel)
+        
         healthLabel = SKLabelNode(text: "Health: 25")
         healthLabel.position = CGPoint(x: self.frame.minX + 150, y: self.frame.maxY - player.size.height)
-        healthLabel.fontName = "Menlo-Bold"
+        healthLabel.fontName = "Marker Felt Thin"
         healthLabel.fontSize = 36
         healthLabel.fontColor = UIColor.white
         self.addChild(healthLabel)
@@ -102,7 +171,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    func gameOver() {
+    func pauseGame() {
         self.isPaused = true
         spawnAstrogon.invalidate()
     }
@@ -184,7 +253,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
                 animateExplosion(at: (contact.bodyA.node?.position)!, name: (contact.bodyA.node?.name)!)
-                score += 1
+                score += 1*multiplier
+                collisionCounter += 1
             } else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
                 var shapeSides = 0
                 if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue {
@@ -194,11 +264,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     contact.bodyB.node?.removeFromParent()
                     shapeSides = getSidesFromName(name:(contact.bodyB.node?.name)!)
                 }
-                collisionCounter += 1
                 playerHealth -= shapeSides
             }
 //            print("We have contact with an astrogen")
-            
         }
     }
     

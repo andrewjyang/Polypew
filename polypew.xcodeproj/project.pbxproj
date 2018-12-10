@@ -21,6 +21,8 @@
 		49C0629121BDBDCF006833E7 /* pew.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 49C0629021BDBDCF006833E7 /* pew.mp3 */; };
 		49C0629921BDC281006833E7 /* explosion.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 49C0629821BDC281006833E7 /* explosion.mp3 */; };
 		4D3893EA21BA442600DE4668 /* QuestionAnswer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3893E921BA442600DE4668 /* QuestionAnswer.swift */; };
+		4D3893EC21BDF89000DE4668 /* explosion.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4D3893EB21BDF89000DE4668 /* explosion.mp3 */; };
+		4D3893EE21BDFD3B00DE4668 /* QuestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3893ED21BDFD3B00DE4668 /* QuestionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		49C0629021BDBDCF006833E7 /* pew.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = pew.mp3; sourceTree = "<group>"; };
 		49C0629821BDC281006833E7 /* explosion.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = explosion.mp3; sourceTree = "<group>"; };
 		4D3893E921BA442600DE4668 /* QuestionAnswer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionAnswer.swift; sourceTree = "<group>"; };
+		4D3893EB21BDF89000DE4668 /* explosion.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = explosion.mp3; sourceTree = "<group>"; };
+		4D3893ED21BDFD3B00DE4668 /* QuestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,7 @@
 				4942BFEB21AE81BC0089A1DD /* starfield.sks */,
 				4942BFD021AE60E80089A1DD /* GameScene.swift */,
 				49C0628C21BDB958006833E7 /* obliteration.sks */,
+				4D3893EB21BDF89000DE4668 /* explosion.mp3 */,
 				4942BFD221AE60E80089A1DD /* GameViewController.swift */,
 				4942BFD721AE60EA0089A1DD /* Assets.xcassets */,
 				49C0629021BDBDCF006833E7 /* pew.mp3 */,
@@ -87,6 +92,7 @@
 				4942BFD921AE60EA0089A1DD /* LaunchScreen.storyboard */,
 				4942BFDC21AE60EA0089A1DD /* Info.plist */,
 				4D3893E921BA442600DE4668 /* QuestionAnswer.swift */,
+				4D3893ED21BDFD3B00DE4668 /* QuestionViewController.swift */,
 			);
 			path = polypew;
 			sourceTree = "<group>";
@@ -156,6 +162,7 @@
 				4942BFD821AE60EA0089A1DD /* Assets.xcassets in Resources */,
 				4942BFDB21AE60EA0089A1DD /* LaunchScreen.storyboard in Resources */,
 				4942BFE921AE81970089A1DD /* spark.png in Resources */,
+				4D3893EC21BDF89000DE4668 /* explosion.mp3 in Resources */,
 				4942BFCF21AE60E80089A1DD /* Actions.sks in Resources */,
 				49C0629921BDC281006833E7 /* explosion.mp3 in Resources */,
 				4942BFED21AE81BC0089A1DD /* starfield.sks in Resources */,
@@ -170,6 +177,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4942BFD121AE60E80089A1DD /* GameScene.swift in Sources */,
+				4D3893EE21BDFD3B00DE4668 /* QuestionViewController.swift in Sources */,
 				4942BFD321AE60E80089A1DD /* GameViewController.swift in Sources */,
 				4942BFCB21AE60E80089A1DD /* AppDelegate.swift in Sources */,
 				4D3893EA21BA442600DE4668 /* QuestionAnswer.swift in Sources */,
