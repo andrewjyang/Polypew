@@ -60,7 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     enum NodeCategory: UInt32 {
         case player = 1
         case astrogon = 2
-        case torpedo = 4
+        case laser = 4
     }
     
     override func didMove(to view: SKView) {
@@ -92,13 +92,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(scoreLabel)
         
         healthLabel = SKLabelNode(text: "Health: 25")
-        healthLabel.position = CGPoint(x: self.frame.minX + 100, y: self.frame.maxY - player.size.height)
+        healthLabel.position = CGPoint(x: self.frame.minX + 150, y: self.frame.maxY - player.size.height)
         healthLabel.fontName = "Menlo-Bold"
-        healthLabel.fontSize = 24
+        healthLabel.fontSize = 36
         healthLabel.fontColor = UIColor.white
         self.addChild(healthLabel)
-        
-        
+    
         dropAstrogens()
         
     }
@@ -118,14 +117,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: imageName)
         astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
-        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
+//        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
         
-        let position = CGFloat(astrogonPosition.nextInt())
+//        let position = CGFloat(astrogonPosition.nextInt())
+        let position = CGFloat(frame.midX)
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
         astrogon.physicsBody?.categoryBitMask = NodeCategory.astrogon.rawValue
-        astrogon.physicsBody?.contactTestBitMask = NodeCategory.torpedo.rawValue | NodeCategory.player.rawValue
+        astrogon.physicsBody?.contactTestBitMask = NodeCategory.laser.rawValue | NodeCategory.player.rawValue
         astrogon.physicsBody?.collisionBitMask = 0
         self.addChild(astrogon)
         let animationDuration: TimeInterval = 6
@@ -143,31 +143,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     }
     
-    func fireTorpedo() {
+    func fireLaser() {
         self.run(SKAction.playSoundFileNamed("pew.mp3", waitForCompletion: false))
-        let torpedo = SKSpriteNode(imageNamed: "torpedo")
-        torpedo.position = player.position
-        torpedo.position.y += 5
-        torpedo.physicsBody = SKPhysicsBody(circleOfRadius: torpedo.size.width / 2)
-        torpedo.physicsBody?.isDynamic = true
+        let laser = SKSpriteNode(imageNamed: "laser")
+        laser.position = player.position
+        laser.position.y += 5
+        laser.physicsBody = SKPhysicsBody(circleOfRadius: laser.size.width / 2)
+        laser.physicsBody?.isDynamic = true
         
-        torpedo.physicsBody?.categoryBitMask = NodeCategory.torpedo.rawValue
-        torpedo.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
-        torpedo.physicsBody?.collisionBitMask = 0
-        torpedo.physicsBody?.usesPreciseCollisionDetection = true
-        self.addChild(torpedo)
+        laser.physicsBody?.categoryBitMask = NodeCategory.laser.rawValue
+        laser.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
+        laser.physicsBody?.collisionBitMask = 0
+        laser.physicsBody?.usesPreciseCollisionDetection = true
+        self.addChild(laser)
         
         let animationDuration: TimeInterval = 0.3
         var actions = [SKAction]()
         actions.append(SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.size.height + 10), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
-        torpedo.run(SKAction.sequence(actions))
+        laser.run(SKAction.sequence(actions))
     }
     
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !self.isPaused {
-            fireTorpedo()
+            fireLaser()
         }
         
     }
@@ -179,11 +179,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
-            if contact.bodyA.categoryBitMask == NodeCategory.torpedo.rawValue || contact.bodyB.categoryBitMask == NodeCategory.torpedo.rawValue {
-                // we are hitting a torpedo
+            if contact.bodyA.categoryBitMask == NodeCategory.laser.rawValue || contact.bodyB.categoryBitMask == NodeCategory.laser.rawValue {
+                // we are hitting a laser
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
-                animateExplosion(at: (contact.bodyA.node?.position)!)
+                animateExplosion(at: (contact.bodyA.node?.position)!, name: (contact.bodyA.node?.name)!)
                 score += 1
             } else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
                 var shapeSides = 0
@@ -202,9 +202,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func animateExplosion(at position: CGPoint) {
+    func animateExplosion(at position: CGPoint, name: String) {
         self.run(SKAction.playSoundFileNamed("explosion", waitForCompletion: false))
-        let explosion = SKEmitterNode(fileNamed: "explosion")!
+        let explosion = SKEmitterNode(fileNamed: "obliteration")!
+        explosion.particleColorSequence = nil
+        explosion.particleColorBlendFactor = 1.0
+        explosion.particleColor = getColorFromName(name: name)
+        explosion.particleRotation = 2 * CGFloat.pi
+        explosion.particleRotationRange = 4 * CGFloat.pi
+        explosion.particleRotationSpeed = 2 * CGFloat.pi
         explosion.position = position // change from hard-coded value
         explosion.advanceSimulationTime(1)
         explosion.zPosition = 1
@@ -229,6 +235,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 return 8
             default:
                 return 0
+        }
+    }
+    
+    func getColorFromName(name: String) -> SKColor {
+        switch name {
+        case "triangle":
+            return SKColor.yellow
+        case "square":
+            return SKColor.red
+        case "pentagon":
+            return SKColor.green
+        case "hexagon":
+            return SKColor.blue
+        case "octagon":
+            return SKColor.purple
+        default:
+            return SKColor.white
         }
     }
 }
