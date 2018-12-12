@@ -51,13 +51,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var collisionCounter: Int = 0 {
         didSet {
+            // if the user has destroyed 20 astrogons, present a question
             if collisionCounter % 20 == 0 {
                 pauseGame()
-                let questionAnswer = QuestionAnswer()
-                print("Qustion: \(questionAnswer.question)")
-                print("Options: \(questionAnswer.options)")
-                print("Answer: \(questionAnswer.answer)")
                 
+                // Generate a question
+                let questionAnswer = QuestionAnswer()
+                
+                // generate an alert asking the question
                 let alert = UIAlertController(title: questionAnswer.question, message: "Pick an answer from below:", preferredStyle: .actionSheet)
                 alert.addAction(UIAlertAction(title: questionAnswer.options[0], style: .default, handler: { action in
                     if(questionAnswer.options[0] == questionAnswer.answer) {
@@ -70,10 +71,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.dropAstrogens()
                 }))
                 
+                // if the user selects the first option
                 alert.addAction(UIAlertAction(title: questionAnswer.options[1], style: .default, handler: { action in
+                    // if the first option is the answer
                     if(questionAnswer.options[1] == questionAnswer.answer) {
                         self.multiplier += 1
-                        print("guessed correctly")
                     } else {
                         self.multiplier = 1
                     }
@@ -81,7 +83,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.dropAstrogens()
                 }))
                 
+                // if the user selects the second option
                 alert.addAction(UIAlertAction(title: questionAnswer.options[2], style: .default, handler: { action in
+                    // if the second option is the answer
                     if(questionAnswer.options[2] == questionAnswer.answer) {
                         self.multiplier += 1
                         print("guessed correctly")
@@ -92,7 +96,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.dropAstrogens()
                 }))
                 
+                // if the user selects the third option
                 alert.addAction(UIAlertAction(title: questionAnswer.options[3], style: .default, handler: { action in
+                    // if the third option is the answer
                     if(questionAnswer.options[3] == questionAnswer.answer) {
                         self.multiplier += 1
                         
@@ -104,6 +110,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.dropAstrogens()
                 }))
                 
+                // present the alert to the view
                 if self.viewController != nil {
                     self.viewController!.present(alert, animated: true, completion: nil)
                 }
@@ -189,17 +196,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      Initialize all values needed for to start a new game
     */
     func initializeGame() {
+        // initialize the starfield
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
         starfield.advanceSimulationTime(10)
         starfield.zPosition = -1
         self.addChild(starfield)
         
+        // initialize the player
         player = SKSpriteNode(imageNamed: "spaceship")
         player.size = CGSize(width: 160, height: 140)
         player.position = CGPoint(x: self.frame.midX, y: self.frame.minY + player.size.height)
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
         
+        // initialize the player's physics body
         player.physicsBody?.categoryBitMask = NodeCategory.player.rawValue
         player.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
         player.physicsBody?.collisionBitMask = NodeCategory.wall.rawValue
@@ -208,9 +218,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.mass = 0.01
         addChild(player)
         
+        // set the gravity for the the scene
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
         self.physicsWorld.contactDelegate = self
         
+        // initialize the score label
         scoreLabel = SKLabelNode(text: "Score: 0")
         scoreLabel.position = CGPoint(x: self.frame.maxX - 150, y: self.frame.maxY - player.size.height)
         scoreLabel.fontName = "Menlo"
@@ -219,6 +231,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         score = 0
         self.addChild(scoreLabel)
         
+        // initialize the multiplier label
         multiplierLabel = SKLabelNode(text: "Multiplier: x1")
         multiplierLabel.position = CGPoint(x: self.frame.minX + 194, y: self.frame.maxY - 1.4 * player.size.height)
         multiplierLabel.fontName = "Menlo"
@@ -226,6 +239,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         multiplierLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         self.addChild(multiplierLabel)
         
+        // initialize the health label
         healthLabel = SKLabelNode(text: "Health: 25")
         healthLabel.position = CGPoint(x: self.frame.minX + 150, y: self.frame.maxY - player.size.height)
         healthLabel.fontName = "Menlo"
@@ -233,6 +247,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         healthLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         self.addChild(healthLabel)
         
+        // initialize the leftwall of the app
         leftWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
         leftWall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 10, height: self.frame.height))
         leftWall.position = CGPoint(x: self.frame.minX, y: 0)
@@ -241,6 +256,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         leftWall.color = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         addChild(leftWall)
         
+        // initialize the right wall of the app
         rightWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
         rightWall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 10, height: self.frame.height))
         rightWall.position = CGPoint(x: self.frame.maxX, y: 0)
@@ -249,15 +265,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         rightWall.color = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         addChild(rightWall)
         
+        // set default values for labels
         self.multiplier = 1
         self.score = 0
         self.playerHealth = 25
         
+        // initialize the play button
         playButton = SKSpriteNode(imageNamed: "play-button")
         playButton.position = CGPoint(x: 0, y: 0)
         self.zPosition = 1
         self.addChild(playButton)
         
+        // initialize the info button
         infoButton = SKSpriteNode(imageNamed: "info")
         infoButton.position = CGPoint(x: 0, y: 0 - player.size.height)
         self.zPosition = 1
@@ -280,6 +299,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         highScoreLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         self.zPosition = 1
         self.addChild(highScoreLabel)
+
+        // begin dropping astrogens
         dropAstrogens()
     }
     
@@ -311,15 +332,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      Add an astrogen to the screen
     */
     @objc func addAstrogon() {
+        // generate an astrogen object
         astrogons = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: astrogons) as! [String]
         let imageName = astrogons.randomElement()!
         let astrogon  = SKSpriteNode(imageNamed: imageName)
         astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
+        
+        // generate a random x value for the astrogon to drop down
         let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
         let position = CGFloat(astrogonPosition.nextInt())
-//        let position = CGFloat(frame.midX)  testing...
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
+        
+        // add the physics body for the astrogon
         astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
         astrogon.physicsBody?.categoryBitMask = NodeCategory.astrogon.rawValue
@@ -328,13 +353,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(astrogon)
         let animationDuration: TimeInterval = 6
         
+        // generate actions for the astrogon
         var actions = [SKAction]()
         actions.append(SKAction.move(to: CGPoint(x: position, y: self.frame.minY - astrogon.size.height), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
-
         astrogon.run(SKAction.sequence(actions))
         
-        
+        // rotate the astrogon
         let rotateAstrogon = SKAction.rotate(byAngle: 2 * CGFloat.pi, duration: 2)
         let rotateAstrogonForever = SKAction.repeatForever(rotateAstrogon)
         astrogon.run(rotateAstrogonForever)
@@ -345,6 +370,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      Fire the laser on the ship
     */
     func fireLaser() {
+        // run sounds and build object
         self.run(SKAction.playSoundFileNamed("pew.mp3", waitForCompletion: false))
         let laser = SKSpriteNode(imageNamed: "laser")
         laser.position = player.position
@@ -352,12 +378,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         laser.physicsBody = SKPhysicsBody(circleOfRadius: laser.size.width / 2)
         laser.physicsBody?.isDynamic = true
         
+        // setup the physics body of the laser
         laser.physicsBody?.categoryBitMask = NodeCategory.laser.rawValue
         laser.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
         laser.physicsBody?.collisionBitMask = 0
         laser.physicsBody?.usesPreciseCollisionDetection = true
         self.addChild(laser)
         
+        // animate the laser
         let animationDuration: TimeInterval = 0.3
         var actions = [SKAction]()
         actions.append(SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.size.height + 10), duration: animationDuration))
@@ -372,20 +400,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      - Parameter event: The even occuring
     */
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // determine where the touch happened
         for touch: AnyObject in touches {
             let location = touch.location(in: self)
-            if infoButton.contains(location) {
+            
+            // see if the user touched the info button and game is paused
+            if infoButton.contains(location) && self.isPaused {
                 let alertController = UIAlertController(title: "Welcome to Polypew!", message: instructions, preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: "dismiss", style: .default, handler: nil))
+                self.viewController!.present(alertController, animated: true)
+            } else if playButton.contains(location) && self.isPaused { // user touches play button and game is paused
+                self.removeAllChildren()
+                initializeGame()
+                self.isPaused = false
+                self.playButton.isHidden = true
+                self.infoButton.isHidden = true
             }
         }
         
+        // if the game is not paused, fire the laser
         if !self.isPaused {
             fireLaser()
-        } else {
-            self.removeAllChildren()
-            initializeGame()
-            self.isPaused = false
         }
         self.playButton.isHidden = true
         self.infoButton.isHidden = true
@@ -401,7 +436,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Called before each frame is rendered
         // Get MotionManager data
         if let data = motionManager.accelerometerData {
-            
             // Only get use data if it is "tilt enough"
             if (fabs(data.acceleration.x) > 0.2) {
                 
@@ -419,7 +453,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      - Parameter contact: The contact that is happening
     */
     func didBegin(_ contact: SKPhysicsContact) {
+        // if an astrogon is initiating contact
         if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
+            // if a laser is hitting an astrogon
             if contact.bodyA.categoryBitMask == NodeCategory.laser.rawValue || contact.bodyB.categoryBitMask == NodeCategory.laser.rawValue {
                 // we are hitting a laser
                 contact.bodyA.node?.removeFromParent()
@@ -427,7 +463,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 animateExplosion(at: (contact.bodyA.node?.position)!, name: (contact.bodyA.node?.name)!)
                 score += 1*multiplier
                 collisionCounter += 1
-            } else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
+            } // if the astrogon is hitting the player
+            else if contact.bodyA.categoryBitMask == NodeCategory.player.rawValue || contact.bodyB.categoryBitMask == NodeCategory.player.rawValue {
                 var shapeSides = 0
                 if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue {
                     contact.bodyA.node?.removeFromParent()
@@ -438,7 +475,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
                 playerHealth -= shapeSides
             }
-//            print("We have contact with an astrogen")
         }
     }
     
@@ -449,8 +485,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      - Parameter name: Name of the astrogen being exploded
     */
     func animateExplosion(at position: CGPoint, name: String) {
+        // run sounds for an explosion
         self.run(SKAction.playSoundFileNamed("explosion", waitForCompletion: false))
         let explosion = SKEmitterNode(fileNamed: "obliteration")!
+        
+        // setup animation for explosion
         explosion.particleColorSequence = nil
         explosion.particleColorBlendFactor = 1.0
         explosion.particleColor = getColorFromName(name: name)
@@ -461,6 +500,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         explosion.advanceSimulationTime(1)
         explosion.zPosition = 1
         
+        // fade out the animation
         let fadeOut = SKAction.fadeOut(withDuration: 1)
         let remove = SKAction.removeFromParent()
         explosion.run(SKAction.sequence([fadeOut, remove]))
@@ -514,6 +554,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 }
 
+// modify the UIColor so we use color values that are actually our shape
 extension UIColor {
     convenience init(red: Int, green: Int, blue: Int) {
         assert(red >= 0 && red <= 255, "Invalid red component")
