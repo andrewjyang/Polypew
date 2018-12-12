@@ -279,10 +279,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: imageName)
         astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
-//        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
-        
-//        let position = CGFloat(astrogonPosition.nextInt())
-        let position = CGFloat(frame.midX)
+        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
+        let position = CGFloat(astrogonPosition.nextInt())
+//        let position = CGFloat(frame.midX)  testing...
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
