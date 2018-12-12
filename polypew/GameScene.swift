@@ -415,6 +415,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.isPaused = false
                 self.playButton.isHidden = true
                 self.infoButton.isHidden = true
+                self.highScoreLabel.isHidden = true
             }
         }
         
@@ -422,9 +423,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if !self.isPaused {
             fireLaser()
         }
-        self.playButton.isHidden = true
-        self.infoButton.isHidden = true
-        self.highScoreLabel.isHidden = true
     }
     
     /**
