@@ -248,7 +248,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(playButton)
         
         infoButton = SKSpriteNode(imageNamed: "info")
-        infoButton.position = CGPoint(x: 0 + player.size.height, y: 0)
+        infoButton.position = CGPoint(x: 0, y: 0 - player.size.height)
         self.zPosition = 1
         self.addChild(infoButton)
         
