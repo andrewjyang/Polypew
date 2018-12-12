@@ -14,6 +14,7 @@
  *  octagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  * play button: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  * info: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * retro_music: music by Eric Matyas, www.soundimage.org
  * Color Hex Values:
  - orange: #E5AE14
  - yellow: #FED436
@@ -29,6 +30,7 @@ import SpriteKit
 import GameplayKit
 import CoreMotion
 import UIKit
+import AVFoundation
 
 
 // Class representing the game scene
@@ -119,6 +121,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
+    var backgroundMusic: AVAudioPlayer!
     
     var highScores = [HighScore]() {
         didSet {
@@ -143,6 +146,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 highScores.append(HighScore(score: score))
                 highScoreLabel.text = "High Score: \(getHighScore(highScores: highScores))"
                 pauseGame()
+                backgroundMusic.pause()
                 self.playButton.isHidden = false
                 self.infoButton.isHidden = false
                 self.highScoreLabel.isHidden = false
@@ -196,6 +200,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      Initialize all values needed for to start a new game
     */
     func initializeGame() {
+        let musicURL = Bundle.main.url(forResource: "retro_music.mp3", withExtension: nil)
+        do {
+            backgroundMusic = try AVAudioPlayer(contentsOf: musicURL!)
+        } catch {
+            print("error accessing music")
+        }
+        backgroundMusic.numberOfLoops = -1
+        backgroundMusic.play()
+        
         // initialize the starfield
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
@@ -415,6 +428,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.isPaused = false
                 self.playButton.isHidden = true
                 self.infoButton.isHidden = true
+                self.highScoreLabel.isHidden = true
             }
         }
         
@@ -422,9 +436,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if !self.isPaused {
             fireLaser()
         }
-        self.playButton.isHidden = true
-        self.infoButton.isHidden = true
-        self.highScoreLabel.isHidden = true
     }
     
     /**
