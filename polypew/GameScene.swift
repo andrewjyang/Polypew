@@ -12,17 +12,21 @@
  *  pentagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  *  hexagon icon: <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  *  octagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * play button: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  * Created by Andrew Yang and Andrew Zenoni on November 29, 2018
  * Copyright © 2018 Andrew Yang and Andrew Zenoni. All rights reserved.
  */
 
 import SpriteKit
 import GameplayKit
+import CoreMotion
+
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var starfield: SKEmitterNode!
     var player: SKSpriteNode!
+    let motionManager: CMMotionManager = CMMotionManager()
     
     var viewController: GameViewController? = nil
     
@@ -110,6 +114,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if playerHealth <= 0 {
                 playerHealth = 0
                 pauseGame()
+                self.playButton.isHidden = false
             }
             healthLabel.text = "Health: \(playerHealth)"
         }
@@ -117,6 +122,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var spawnAstrogon: Timer!
     var astrogons = ["triangle", "square", "pentagon", "hexagon", "octagon"]
+    
+    var playButton: SKSpriteNode!
     
     
     enum NodeCategory: UInt32 {
@@ -126,6 +133,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didMove(to view: SKView) {
+        initializeGame()
+        pauseGame()
+        motionManager.startAccelerometerUpdates()
+    }
+    
+    func displayPlayButton() {
+    
+    }
+    
+    func initializeGame() {
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
         starfield.advanceSimulationTime(10)
@@ -140,6 +157,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         player.physicsBody?.categoryBitMask = NodeCategory.player.rawValue
         player.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
         player.physicsBody?.collisionBitMask = 0
+        player.physicsBody?.isDynamic = true
+        player.physicsBody?.affectedByGravity = false
+        player.physicsBody?.mass = 1
         addChild(player)
         
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
@@ -166,9 +186,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         healthLabel.fontSize = 36
         healthLabel.fontColor = UIColor.white
         self.addChild(healthLabel)
-    
-        dropAstrogens()
         
+        self.multiplier = 1
+        self.score = 0
+        self.playerHealth = 25
+        
+        playButton = SKSpriteNode(imageNamed: "play-button")
+        playButton.position = CGPoint(x: 0, y: 0)
+        self.zPosition = 1
+        self.addChild(playButton)
+        
+        dropAstrogens()
     }
     
     func pauseGame() {
@@ -186,10 +214,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: imageName)
         astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
-//        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
+        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
         
-//        let position = CGFloat(astrogonPosition.nextInt())
-        let position = CGFloat(frame.midX)
+        let position = CGFloat(astrogonPosition.nextInt())
+//        let position = CGFloat(frame.midX)
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
@@ -231,18 +259,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         actions.append(SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.size.height + 10), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
         laser.run(SKAction.sequence(actions))
+        
+        
     }
     
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !self.isPaused {
             fireLaser()
+        } else {
+            self.removeAllChildren()
+            initializeGame()
+            self.isPaused = false
         }
+        self.playButton.isHidden = true
         
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        // Get MotionManager data
+        if let data = motionManager.accelerometerData {
+            
+            // Only get use data if it is "tilt enough"
+            if (fabs(data.acceleration.x) > 0.2) {
+                
+                // Apply force to the moving object
+                player.physicsBody?.applyForce(CGVector(dx: 80 * CGFloat(data.acceleration.x), dy: 0))
+                
+            }
+        }
     }
     
     
