@@ -22,6 +22,7 @@ import GameplayKit
 import CoreMotion
 
 
+// Class representing the game scene
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var starfield: SKEmitterNode!
@@ -136,16 +137,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case wall = 8
     }
     
+    /**
+     Scene came into view. Perform initial setup steps
+     
+     - Parameter view: the view that is loaded
+    */
     override func didMove(to view: SKView) {
         initializeGame()
         pauseGame()
         motionManager.startAccelerometerUpdates()
     }
     
-    func displayPlayButton() {
-    
-    }
-    
+    /**
+     Initialize all values needed for to start a new game
+    */
     func initializeGame() {
         starfield = SKEmitterNode(fileNamed: "starfield")
         starfield.position = CGPoint(x:0, y: 1472) // change from hard-coded value
@@ -217,15 +222,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         dropAstrogens()
     }
     
+    /**
+     Pause the game
+    */
     func pauseGame() {
         self.isPaused = true
         spawnAstrogon.invalidate()
     }
     
+    /**
+     Drop astrogens
+    */
     func dropAstrogens() {
         spawnAstrogon = Timer.scheduledTimer(timeInterval: 0.75, target: self, selector: #selector(addAstrogon), userInfo: nil, repeats: true)
     }
     
+    /**
+     Add an astrogen to the screen
+    */
     @objc func addAstrogon() {
         astrogons = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: astrogons) as! [String]
         let imageName = astrogons.randomElement()!
@@ -258,6 +272,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     }
     
+    /**
+     Fire the laser on the ship
+    */
     func fireLaser() {
         self.run(SKAction.playSoundFileNamed("pew.mp3", waitForCompletion: false))
         let laser = SKSpriteNode(imageNamed: "laser")
@@ -281,7 +298,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    
+    /**
+     Function called whenever the user finishes touching the screen
+     
+     - Parameter touches: The touch that is happening
+     - Parameter event: The even occuring
+    */
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if !self.isPaused {
             fireLaser()
@@ -294,6 +316,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
+    /**
+     Function called before each frame is rendered
+     
+     - Parameter currentTime: Current time of the system
+    */
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         // Get MotionManager data
@@ -310,6 +337,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    /**
+     Called when two bodies come into contact with one another
+     
+     - Parameter contact: The contact that is happening
+    */
     func didBegin(_ contact: SKPhysicsContact) {
         if contact.bodyA.categoryBitMask == NodeCategory.astrogon.rawValue || contact.bodyB.categoryBitMask == NodeCategory.astrogon.rawValue {
             if contact.bodyA.categoryBitMask == NodeCategory.laser.rawValue || contact.bodyB.categoryBitMask == NodeCategory.laser.rawValue {
@@ -334,6 +366,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    /**
+     Animate an explosion at passed in point
+     
+     - Parameter position: The position to animate the explosion
+     - Parameter name: Name of the astrogen being exploded
+    */
     func animateExplosion(at position: CGPoint, name: String) {
         self.run(SKAction.playSoundFileNamed("explosion", waitForCompletion: false))
         let explosion = SKEmitterNode(fileNamed: "obliteration")!
@@ -353,6 +391,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(explosion)
     }
     
+    /**
+     Gets the number of sides based on the passed in name
+     
+     - Parameter name: Name of the astrogen
+     - Returns: The number of sides the astrogen has
+    */
     func getSidesFromName(name: String) -> Int {
         switch name {
             case "triangle":
@@ -370,6 +414,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    /**
+     Gets the color based on the name of the astrogen
+     
+     - Parameter name: Name of the astrogen
+     - Returns: Color representing the astrogen
+    */
     func getColorFromName(name: String) -> SKColor {
         switch name {
         case "triangle":
