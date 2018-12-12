@@ -28,6 +28,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var player: SKSpriteNode!
     let motionManager: CMMotionManager = CMMotionManager()
     
+    var leftWall = SKSpriteNode()
+    var rightWall = SKSpriteNode()
+    
     var viewController: GameViewController? = nil
     
     var multiplier: Int = 1 {
@@ -130,6 +133,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case player = 1
         case astrogon = 2
         case laser = 4
+        case wall = 8
     }
     
     override func didMove(to view: SKView) {
@@ -156,10 +160,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         player.physicsBody?.categoryBitMask = NodeCategory.player.rawValue
         player.physicsBody?.contactTestBitMask = NodeCategory.astrogon.rawValue
-        player.physicsBody?.collisionBitMask = 0
+        player.physicsBody?.collisionBitMask = NodeCategory.wall.rawValue
         player.physicsBody?.isDynamic = true
         player.physicsBody?.affectedByGravity = false
-        player.physicsBody?.mass = 1
+        player.physicsBody?.mass = 0.01
         addChild(player)
         
         self.physicsWorld.gravity = CGVector(dx:0, dy:0) // no effect of gravity in x or y direction
@@ -186,6 +190,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         healthLabel.fontSize = 36
         healthLabel.fontColor = UIColor.white
         self.addChild(healthLabel)
+        
+        leftWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
+        leftWall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 10, height: self.frame.height))
+        leftWall.position = CGPoint(x: self.frame.minX, y: 0)
+        leftWall.physicsBody?.isDynamic = false
+        leftWall.physicsBody?.categoryBitMask = NodeCategory.wall.rawValue
+        addChild(leftWall)
+        
+        rightWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
+        rightWall.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 10, height: self.frame.height))
+        rightWall.position = CGPoint(x: self.frame.maxX, y: 0)
+        rightWall.physicsBody?.isDynamic = false
+        rightWall.physicsBody?.categoryBitMask = NodeCategory.wall.rawValue
+        addChild(rightWall)
         
         self.multiplier = 1
         self.score = 0
@@ -285,7 +303,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if (fabs(data.acceleration.x) > 0.2) {
                 
                 // Apply force to the moving object
-                player.physicsBody?.applyForce(CGVector(dx: 80 * CGFloat(data.acceleration.x), dy: 0))
+                player.physicsBody?.applyForce(CGVector(dx: 12 * CGFloat(data.acceleration.x), dy: 0))
                 
             }
         }
