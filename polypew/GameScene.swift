@@ -113,6 +113,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    var highScores = [HighScore]() {
+        didSet {
+            HighScore.saveToFile(scores: highScores)
+        }
+    }
+    var highScoreLabel: SKLabelNode!
+    
     var scoreLabel: SKLabelNode!
     var healthLabel: SKLabelNode!
     var multiplierLabel: SKLabelNode!
@@ -126,9 +133,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         didSet {
             if playerHealth <= 0 {
                 playerHealth = 0
+                highScores.append(HighScore(score: score))
+                highScoreLabel.text = "High Score: \(getHighScore(highScores: highScores))"
                 pauseGame()
                 self.playButton.isHidden = false
                 self.infoButton.isHidden = false
+                self.highScoreLabel.isHidden = false
             }
             healthLabel.text = "Health: \(playerHealth)"
         }
@@ -172,6 +182,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         initializeGame()
         pauseGame()
         motionManager.startAccelerometerUpdates()
+        print(HighScore.scoresPListURL)
     }
     
     /**
@@ -204,22 +215,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.position = CGPoint(x: self.frame.maxX - 150, y: self.frame.maxY - player.size.height)
         scoreLabel.fontName = "Menlo"
         scoreLabel.fontSize = 36
-        scoreLabel.fontColor = UIColor(red: 0xFE, green: 0xD4, blue: 0x36)
+        scoreLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         score = 0
         self.addChild(scoreLabel)
         
         multiplierLabel = SKLabelNode(text: "Multiplier: x1")
         multiplierLabel.position = CGPoint(x: self.frame.minX + 194, y: self.frame.maxY - 1.4 * player.size.height)
-        multiplierLabel.fontName = "Menlo-Bold"
+        multiplierLabel.fontName = "Menlo"
         multiplierLabel.fontSize = 36
-        multiplierLabel.fontColor = UIColor(red: 0x09, green: 0x53, blue: 0xEB)
+        multiplierLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         self.addChild(multiplierLabel)
         
         healthLabel = SKLabelNode(text: "Health: 25")
         healthLabel.position = CGPoint(x: self.frame.minX + 150, y: self.frame.maxY - player.size.height)
         healthLabel.fontName = "Menlo"
         healthLabel.fontSize = 36
-        healthLabel.fontColor = UIColor(red: 0x81, green: 0xD8, blue: 0x49)
+        healthLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         self.addChild(healthLabel)
         
         leftWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
@@ -252,7 +263,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.zPosition = 1
         self.addChild(infoButton)
         
+        if let highScores = HighScore.loadFromFile() {
+            self.highScores = highScores
+        } else {
+            highScores.append(HighScore(score: 0))
+        }
+        
+        for score in highScores {
+            print(score.score)
+        }
+        
+        highScoreLabel = SKLabelNode(text: "High Score: \(String(describing: getHighScore(highScores: highScores)))")
+        highScoreLabel.position = CGPoint(x: 0, y: 0 - 2 * player.size.height)
+        highScoreLabel.fontName = "Menlo"
+        highScoreLabel.fontSize = 36
+        highScoreLabel.fontColor = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
+        self.zPosition = 1
+        self.addChild(highScoreLabel)
         dropAstrogens()
+    }
+    
+    func getHighScore(highScores: [HighScore]) -> Int {
+        let highScore = highScores.max{$0.score < $1.score}
+        if let highScore = highScore {
+            return highScore.score
+        } else {
+            return 0
+        }
     }
     
     /**
@@ -326,8 +363,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         actions.append(SKAction.move(to: CGPoint(x: player.position.x, y: self.frame.size.height + 10), duration: animationDuration))
         actions.append(SKAction.removeFromParent())
         laser.run(SKAction.sequence(actions))
-        
-        
     }
     
     /**
@@ -354,6 +389,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         self.playButton.isHidden = true
         self.infoButton.isHidden = true
+        self.highScoreLabel.isHidden = true
     }
     
     /**
