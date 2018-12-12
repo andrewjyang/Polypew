@@ -13,6 +13,14 @@
  *  hexagon icon: <div>Icons made by <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  *  octagon icon: <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
  * play button: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * info: <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"                 title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"                 title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+ * Color Hex Values:
+ - orange: #E5AE14
+ - yellow: #FED436
+ - red: #CB001E
+ - green: #81D849
+ - purple: #7F21B8
+ - blue: #0953EB
  * Created by Andrew Yang and Andrew Zenoni on November 29, 2018
  * Copyright © 2018 Andrew Yang and Andrew Zenoni. All rights reserved.
  */
@@ -20,6 +28,7 @@
 import SpriteKit
 import GameplayKit
 import CoreMotion
+import UIKit
 
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
@@ -35,13 +44,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var multiplier: Int = 1 {
         didSet {
-            multiplierLabel.text = "x\(multiplier)"
+            multiplierLabel.text = "Multiplier: x\(multiplier)"
         }
     }
     
     var collisionCounter: Int = 0 {
         didSet {
-            if collisionCounter % 5 == 0 {
+            if collisionCounter % 20 == 0 {
                 pauseGame()
                 let questionAnswer = QuestionAnswer()
                 print("Qustion: \(questionAnswer.question)")
@@ -118,6 +127,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 playerHealth = 0
                 pauseGame()
                 self.playButton.isHidden = false
+                self.infoButton.isHidden = false
             }
             healthLabel.text = "Health: \(playerHealth)"
         }
@@ -125,8 +135,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var spawnAstrogon: Timer!
     var astrogons = ["triangle", "square", "pentagon", "hexagon", "octagon"]
-    
+    var instructions = """
+    Polypew is a simple and fun game to improve your math skills!
+    As you are voyaging through space, you soon find yourself
+    trapped in a field of endless astrogons (astroid polygons).
+
+    Instructions:
+    Tilt your phone to avoid the astrogons.
+    Tap the screen to fire your torpedoes.
+
+    You lose health if an astrogon comes into contact with your spaceship.
+    The number of sides an astrogon has determines the amount of damage you will receive.
+    For every few astrogons destroyed, you will be prompted a math question.
+    For every correct math question answered, your score multiplier will increase.
+
+    Have fun and good luck!
+    """
     var playButton: SKSpriteNode!
+    var infoButton: SKNode!
     
     
     enum NodeCategory: UInt32 {
@@ -140,10 +166,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         initializeGame()
         pauseGame()
         motionManager.startAccelerometerUpdates()
-    }
-    
-    func displayPlayButton() {
-    
     }
     
     func initializeGame() {
@@ -170,25 +192,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsWorld.contactDelegate = self
         
         scoreLabel = SKLabelNode(text: "Score: 0")
-        scoreLabel.position = CGPoint(x: self.frame.midX, y: self.frame.maxY - player.size.height)
-        scoreLabel.fontName = "Marker Felt Thin"
+        scoreLabel.position = CGPoint(x: self.frame.maxX - 150, y: self.frame.maxY - player.size.height)
+        scoreLabel.fontName = "Menlo"
         scoreLabel.fontSize = 36
-        scoreLabel.fontColor = UIColor.white
+        scoreLabel.fontColor = UIColor(red: 0xFE, green: 0xD4, blue: 0x36)
         score = 0
         self.addChild(scoreLabel)
         
-        multiplierLabel = SKLabelNode(text: "x1")
-        multiplierLabel.position = CGPoint(x: self.frame.maxX - 150, y: self.frame.maxY - player.size.height)
-        multiplierLabel.fontName = "Marker Felt Thin"
+        multiplierLabel = SKLabelNode(text: "Multiplier: x1")
+        multiplierLabel.position = CGPoint(x: self.frame.minX + 194, y: self.frame.maxY - 1.4 * player.size.height)
+        multiplierLabel.fontName = "Menlo-Bold"
         multiplierLabel.fontSize = 36
-        multiplierLabel.fontColor = UIColor.green
+        multiplierLabel.fontColor = UIColor(red: 0x09, green: 0x53, blue: 0xEB)
         self.addChild(multiplierLabel)
         
         healthLabel = SKLabelNode(text: "Health: 25")
         healthLabel.position = CGPoint(x: self.frame.minX + 150, y: self.frame.maxY - player.size.height)
-        healthLabel.fontName = "Marker Felt Thin"
+        healthLabel.fontName = "Menlo"
         healthLabel.fontSize = 36
-        healthLabel.fontColor = UIColor.white
+        healthLabel.fontColor = UIColor(red: 0x81, green: 0xD8, blue: 0x49)
         self.addChild(healthLabel)
         
         leftWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
@@ -196,6 +218,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         leftWall.position = CGPoint(x: self.frame.minX, y: 0)
         leftWall.physicsBody?.isDynamic = false
         leftWall.physicsBody?.categoryBitMask = NodeCategory.wall.rawValue
+        leftWall.color = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         addChild(leftWall)
         
         rightWall = SKSpriteNode(color: .white, size: CGSize(width: 10, height: self.frame.height))
@@ -203,6 +226,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         rightWall.position = CGPoint(x: self.frame.maxX, y: 0)
         rightWall.physicsBody?.isDynamic = false
         rightWall.physicsBody?.categoryBitMask = NodeCategory.wall.rawValue
+        rightWall.color = UIColor(red: 0xE5, green: 0xAE, blue: 0x14)
         addChild(rightWall)
         
         self.multiplier = 1
@@ -213,6 +237,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         playButton.position = CGPoint(x: 0, y: 0)
         self.zPosition = 1
         self.addChild(playButton)
+        
+        infoButton = SKSpriteNode(imageNamed: "info")
+        infoButton.position = CGPoint(x: 0 + player.size.height, y: 0)
+        self.zPosition = 1
+        self.addChild(infoButton)
         
         dropAstrogens()
     }
@@ -232,10 +261,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let astrogon  = SKSpriteNode(imageNamed: imageName)
         astrogon.name = imageName
         astrogon.size = CGSize(width: 84, height: 84)
-        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
+//        let astrogonPosition = GKRandomDistribution(lowestValue: Int(self.frame.minX + astrogon.size.width), highestValue: Int(self.frame.maxX - astrogon.size.width))
         
-        let position = CGFloat(astrogonPosition.nextInt())
-//        let position = CGFloat(frame.midX)
+//        let position = CGFloat(astrogonPosition.nextInt())
+        let position = CGFloat(frame.midX)
         astrogon.position = CGPoint(x: position, y: self.frame.size.height + astrogon.size.height)
         astrogon.physicsBody = SKPhysicsBody(rectangleOf: astrogon.size)
         astrogon.physicsBody?.isDynamic = true
@@ -283,6 +312,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch: AnyObject in touches {
+            let location = touch.location(in: self)
+            if infoButton.contains(location) {
+                let alertController = UIAlertController(title: "Welcome to Polypew!", message: instructions, preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "dismiss", style: .default, handler: nil))
+            }
+        }
+        
         if !self.isPaused {
             fireLaser()
         } else {
@@ -291,7 +328,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.isPaused = false
         }
         self.playButton.isHidden = true
-        
+        self.infoButton.isHidden = true
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -373,17 +410,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func getColorFromName(name: String) -> SKColor {
         switch name {
         case "triangle":
-            return SKColor.yellow
+            return SKColor.init(red: 0xFE, green: 0xD4, blue: 0x36)
         case "square":
-            return SKColor.red
+            return SKColor.init(red: 0xCB, green: 0x00, blue: 0x1E)
         case "pentagon":
-            return SKColor.green
+            return SKColor.init(red: 0x81, green: 0xD8, blue: 0x49)
         case "hexagon":
-            return SKColor.blue
+            return SKColor.init(red: 0x09, green: 0x53, blue: 0xEB)
         case "octagon":
-            return SKColor.purple
+            return SKColor.init(red: 0x7F, green: 0x21, blue: 0xB8)
         default:
             return SKColor.white
         }
+    }
+}
+
+extension UIColor {
+    convenience init(red: Int, green: Int, blue: Int) {
+        assert(red >= 0 && red <= 255, "Invalid red component")
+        assert(green >= 0 && green <= 255, "Invalid green component")
+        assert(blue >= 0 && blue <= 255, "Invalid blue component")
+        
+        self.init(red: CGFloat(red) / 255.0, green: CGFloat(green) / 255.0, blue: CGFloat(blue) / 255.0, alpha: 1.0)
+    }
+    
+    convenience init(rgb: Int) {
+        self.init(
+            red: (rgb >> 16) & 0xFF,
+            green: (rgb >> 8) & 0xFF,
+            blue: rgb & 0xFF
+        )
     }
 }
